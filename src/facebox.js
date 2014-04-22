@@ -83,9 +83,12 @@
   $.extend($.facebox, {
     settings: {
       opacity      : 0.2,
+      closebox     : true,
+      closeclick   : true,
+      closekey     : true,
       overlay      : true,
-      loadingImage : '/facebox/loading.gif',
-      closeImage   : '/facebox/closelabel.png',
+      loadingImage : '/cms/js/homepage_overlay_ad/loading.gif',
+      closeImage   : '/cms/js/homepage_overlay_ad/closelabel.png',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
       faceboxHtml  : '\
     <div id="facebox" style="display:none;"> \
@@ -107,13 +110,16 @@
 
       $('#facebox').show().css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
-        left:	$(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2)
+        left:	$(window).width() / 2 - ($('#facebox .popup').width() / 2)
       })
 
-      $(document).bind('keydown.facebox', function(e) {
-        if (e.keyCode == 27) $.facebox.close()
-        return true
-      })
+      if($.facebox.settings.closekey){
+       $(document).bind('keydown.facebox', function(e) {
+         if (e.keyCode == 27) $.facebox.close()
+         return true
+       })
+      }
+
       $(document).trigger('loading.facebox')
     },
 
@@ -122,7 +128,7 @@
       if (klass) $('#facebox .content').addClass(klass)
       $('#facebox .content').empty().append(data)
       $('#facebox .popup').children().fadeIn('normal')
-      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').outerWidth() / 2))
+      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').width() / 2))
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
 
@@ -183,11 +189,17 @@
       preload.slice(-1).src = $(this).css('background-image').replace(/url\((.+)\)/, '$1')
     })
 
-    $('#facebox .close')
-      .click($.facebox.close)
-      .append('<img src="'
-              + $.facebox.settings.closeImage
-              + '" class="close_image" title="close">')
+
+    if($.facebox.settings.closebox){
+     $('#facebox .close')
+       .click($.facebox.close)
+       .append('<img src="'
+               + $.facebox.settings.closeImage
+               + '" class="close_image" title="close">')
+    }
+
+
+
   }
 
   // getPageScroll() by quirksmode.com
@@ -275,7 +287,7 @@
 
     $('#facebox_overlay').hide().addClass("facebox_overlayBG")
       .css('opacity', $.facebox.settings.opacity)
-      .click(function() { $(document).trigger('close.facebox') })
+      .click(function() {if($.facebox.settings.closeclick){$(document).trigger('close.facebox')}})
       .fadeIn(200)
     return false
   }
